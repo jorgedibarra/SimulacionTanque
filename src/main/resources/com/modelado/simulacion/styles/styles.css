@@ -1,0 +1,24 @@
+/* Archivo styles.css */
+.vbox-con-borde {
+    -fx-border-color: #ff5722;       /* Color del borde (naranja) */
+    -fx-border-width: 2px;          /* Grosor del borde */
+    -fx-border-radius: 5px;         /* Bordes redondeados (opcional) */
+    -fx-border-style: solid;        /* Estilo: sólido, dashed, etc. */
+    -fx-padding: 10px;             /* Espacio interno para que el contenido no toque el borde */
+}
+
+/* Estilo para el Pane de simulación */
+#simulacionPane {
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
+}
+
+/* Estilo para los botones */
+.button {
+    -fx-font-weight: bold;
+}
+
+/* Estilo para el campo setpoint inválido */
+.text-field:error {
+    -fx-border-color: red;
+}
