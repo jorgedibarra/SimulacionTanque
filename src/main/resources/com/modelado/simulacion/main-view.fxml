@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.layout.Pane?>
-<BorderPane xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.modelado.simulacion.controller.SimulacionController"
-            stylesheets="@/com/modelado/simulacion/styles/styles.css">
+<BorderPane styleClass="fondo" stylesheets="@/com/modelado/simulacion/styles/styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.modelado.simulacion.controller.SimulacionController">
     <!-- GRÁFICA ARRIBA -->
     <top>
         <LineChart fx:id="grafica" prefHeight="250" prefWidth="800" title="Respuesta del Sistema">
@@ -25,7 +13,7 @@
                 <NumberAxis label="Tiempo (s)" />
             </xAxis>
             <yAxis>
-                <NumberAxis autoRanging="false" label="Nivel" lowerBound="0" upperBound="1" />
+                <NumberAxis autoRanging="false" label="Nivel" upperBound="1" />
             </yAxis>
         </LineChart>
     </top>
@@ -39,34 +27,30 @@
             </padding>
             <!-- VISUALIZACIÓN DEL TANQUE -->
             <VBox alignment="center" spacing="10" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS">
-                <Label text="Tanque de Nivel">
-               <font>
-                  <Font size="14.0" />
-               </font></Label>
-                <Pane fx:id="simulacionPane" minHeight="300" minWidth="500" style="-fx-background-color: white;" />
+                <Label styleClass="label-titulo" text="Simulacíon del tanque" />
+                <Pane fx:id="simulacionPane" style="-fx-background-color: white;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
             </VBox>
 
             <!-- CONTROLES -->
-            <VBox alignment="top_left" spacing="65" styleClass="vbox-con-borde">
+            <VBox alignment="top_left" prefHeight="442.0" prefWidth="300.0" spacing="45" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS" >
 
-                <Label alignment="CENTER" prefHeight="17.0" prefWidth="214.0" text="Parametros configurables">
-               <font>
-                  <Font size="16.0" />
-               </font></Label>
+                <Label alignment="CENTER" prefHeight="50.0" prefWidth="279.0" styleClass="label-titulo" text="Parametros configurables" />
+                <Label prefWidth="272.0" styleClass="label-indicaciones" text="Debe ingresar un valor numerico entre 0 y 1 para iniciar la simulacíón" wrapText="true"/>
 
-                <HBox spacing="5">
-                    <Label text="Set point: " />
-                    <TextField fx:id="setpointField" />
+                <HBox spacing="9">
+                    <Label text="Nivel maximo: " />
+                    <TextField fx:id="setpointField" prefHeight="30.0" prefWidth="130.0" />
                 </HBox>
 
-                <HBox spacing="5">
-                    <Label text="Retardo (ms)" />
-                    <Slider fx:id="delaySlider" blockIncrement="50" max="1000" min="0" value="250" />
+                <HBox spacing="10" >
+                    <Label text="Nivel minimo: " />
+                    <TextField fx:id="levelMinField" prefHeight="30.0" prefWidth="130.0" />
                 </HBox>
 
                 <HBox spacing="10">
-                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="25.0" prefWidth="100.0" style="-fx-background-color: green; -fx-text-fill: white;" text="INICIAR" />
-                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="25.0" prefWidth="100.0" style="-fx-background-color: red; -fx-text-fill: white;" text="DETENER" />
+                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: green; -fx-text-fill: white;" text="ABRIR" />
+                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: red; -fx-text-fill: white;" text="CERRAR" />
+                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="VACIAR" />
                 </HBox>
 
             </VBox>

@@ -1,10 +1,14 @@
 /* Archivo styles.css */
 .vbox-con-borde {
-    -fx-border-color: #ff5722;       /* Color del borde (naranja) */
-    -fx-border-width: 2px;          /* Grosor del borde */
+    -fx-border-color: black;       /* Color del borde (naranja) */
+    -fx-border-width: 4px;          /* Grosor del borde */
     -fx-border-radius: 5px;         /* Bordes redondeados (opcional) */
     -fx-border-style: solid;        /* Estilo: sólido, dashed, etc. */
     -fx-padding: 10px;             /* Espacio interno para que el contenido no toque el borde */
+}
+
+.root {
+    -fx-background-color: linear-gradient(to bottom, #FFFFF0, #DCDCDC);
 }
 
 /* Estilo para el Pane de simulación */
@@ -13,12 +17,132 @@
     -fx-border-width: 1px;
 }
 
+.label {
+    -fx-font-size: 16px;            /* Tamaño de fuente */
+    -fx-font-weight: bold;
+    -fx-font-family: "Helvetica Neue"/* Fuente */
+}
+
+.label-titulo {
+    -fx-font-size: 20px;            /* Tamaño de fuente */
+    -fx-text-weight: bold;
+}
+
+.label-indicaciones{
+    -fx-text-alignment: justify; /* Opcional: para justificar el texto */
+}
+
+/* Estilo para el campo de texto */
+.text-field {
+    -fx-background-color: #f0f0f0; /* Color de fondo */
+    -fx-border-radius: 5px;        /* Bordes redondeados */
+    -fx-border-color: #ccc;        /* Color del borde */
+    -fx-border-width: 1px;        /* Grosor del borde */
+    -fx-padding: 5px;             /* Espacio interno */
+    -fx-font-size: 14px;          /* Tamaño de fuente */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+.text-field:focused {
+    -fx-border-color: #66afe9;     /* Color del borde al enfocar */
+    -fx-box-shadow: 0 0 5px rgba(102, 175, 233, 0.5); /* Sombra */
+}
+
 /* Estilo para los botones */
 .button {
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+    -fx-background-radius: 5px; /* Bordes redondeados */
+}
+
+.button:hover {
+    -fx-background-color: #45a049;
+}
+
+.button:pressed {
+    -fx-background-color: #3e8e41;
+    -fx-translate-y: 1px;
 }
 
 /* Estilo para el campo setpoint inválido */
 .text-field:error {
     -fx-border-color: red;
 }
+
+/* Estilo para el campo setpoint válido */
+.transmisor {
+    -fx-fill: white;
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+.tuberia-transmisor {
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 10, 5; /* Línea discontinua */
+}
+
+.texto-transmisor {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.controlador {
+    -fx-fill: white;
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+.linea-controlador {
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 10, 5; /* Línea discontinua */
+}
+
+.texto-controlador {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Estilo para el tanque */
+.tanque {
+    -fx-stroke-width: 5;
+    -fx-fill: linear-gradient(to bottom, #FFFFF0, #DCDCDC); /* Gradiente */
+    -fx-stroke: black;
+}
+
+/* Estilos tuberías */
+.tuberia {
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+/* Estilos valvula */
+.valvula {
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+    -fx-fill: red;
+}
+
+.valvula-linea{
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+.controlador {
+    -fx-fill: white;
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+.texto-controlador {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.agua-tuberia {
+    -fx-stroke: blue; /* Color del agua */
+    -fx-stroke-width: 14; /* Grosor de la línea */
+    -fx-stroke-line-cap: round; /* Radio de la línea */
+}
+
+

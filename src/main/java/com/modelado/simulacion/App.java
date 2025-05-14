@@ -15,6 +15,7 @@ public class App extends Application {
         stage.setTitle("Simulación de Eventos Discretos");
         stage.setScene(scene);
         stage.show();
+        stage.setResizable(false);
     }
 
     public static void main(String[] args) {
