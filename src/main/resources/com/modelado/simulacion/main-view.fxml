@@ -6,56 +6,51 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane styleClass="fondo" stylesheets="@/com/modelado/simulacion/styles/styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.modelado.simulacion.controller.SimulacionController">
-    <!-- GRÁFICA ARRIBA -->
-    <top>
-        <LineChart fx:id="grafica" prefHeight="250" prefWidth="800" title="Respuesta del Sistema">
-            <xAxis>
-                <NumberAxis label="Tiempo (s)" />
-            </xAxis>
-            <yAxis>
-                <NumberAxis autoRanging="false" label="Nivel" upperBound="1" />
-            </yAxis>
-        </LineChart>
-    </top>
+    <left>
+        <!-- VISUALIZACIÓN DEL TANQUE -->
+        <VBox alignment="center" spacing="10" styleClass="espaciado-panel" HBox.hgrow="ALWAYS">
+            <Label styleClass="label-titulo" text="Simulacíon del tanque" />
+            <Pane fx:id="simulacionPane" prefWidth="610" style="-fx-background-color: white;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+        </VBox>
+
+    </left>
 
     <!-- ÁREA PRINCIPAL DIVIDIDA EN 2 COLUMNAS -->
-    <center>
-        <HBox alignment="center" spacing="10" HBox.hgrow="ALWAYS">
-
-            <padding>
-                <Insets bottom="20" left="20" right="20" top="20" />
-            </padding>
-            <!-- VISUALIZACIÓN DEL TANQUE -->
-            <VBox alignment="center" spacing="10" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS">
-                <Label styleClass="label-titulo" text="Simulacíon del tanque" />
-                <Pane fx:id="simulacionPane" style="-fx-background-color: white;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
-            </VBox>
+    <right>
+        <VBox alignment="center" prefWidth="350" spacing="10" styleClass="espaciado-panel">
+            <!-- GRÁFICA ARRIBA -->
+            <LineChart fx:id="grafica" title="Respuesta del Sistema" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets right="25" />
+                </padding>
+                <xAxis>
+                    <NumberAxis label="Tiempo (s)" upperBound="60" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis autoRanging="false" label="Nivel" upperBound="1" />
+                </yAxis>
+            </LineChart>
 
             <!-- CONTROLES -->
-            <VBox alignment="top_left" prefHeight="442.0" prefWidth="300.0" spacing="45" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS" >
+            <VBox alignment="top_left" spacing="30" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS">
 
-                <Label alignment="CENTER" prefHeight="50.0" prefWidth="279.0" styleClass="label-titulo" text="Parametros configurables" />
-                <Label prefWidth="272.0" styleClass="label-indicaciones" text="Debe ingresar un valor numerico entre 0 y 1 para iniciar la simulacíón" wrapText="true"/>
+                <Label alignment="CENTER" prefHeight="50.0" prefWidth="300.0" styleClass="label-titulo" text="Parametros configurables" />
+                <Label prefHeight="70" styleClass="label-indicaciones" text="Debe ingresar un numero entre 0 y 1 para iniciar la simulacíón" wrapText="true" />
 
                 <HBox spacing="9">
-                    <Label text="Nivel maximo: " />
+                    <Label text="Setpoint: " />
                     <TextField fx:id="setpointField" prefHeight="30.0" prefWidth="130.0" />
                 </HBox>
 
-                <HBox spacing="10" >
-                    <Label text="Nivel minimo: " />
-                    <TextField fx:id="levelMinField" prefHeight="30.0" prefWidth="130.0" />
-                </HBox>
-
                 <HBox spacing="10">
-                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: green; -fx-text-fill: white;" text="ABRIR" />
-                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: red; -fx-text-fill: white;" text="CERRAR" />
-                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="VACIAR" />
+                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: green; -fx-text-fill: white;" text="INICIAR" />
+                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: red; -fx-text-fill: white;" text="DETENER" />
+                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="CONSUMO" />
                 </HBox>
 
             </VBox>
 
-        </HBox>
-    </center>
+        </VBox>
+    </right>
 
 </BorderPane>

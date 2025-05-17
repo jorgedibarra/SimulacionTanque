@@ -6,6 +6,9 @@
     -fx-border-style: solid;        /* Estilo: sólido, dashed, etc. */
     -fx-padding: 10px;             /* Espacio interno para que el contenido no toque el borde */
 }
+.espaciado-panel {
+    -fx-padding: 10px;             /* Espacio interno */
+}
 
 .root {
     -fx-background-color: linear-gradient(to bottom, #FFFFF0, #DCDCDC);
@@ -143,6 +146,20 @@
     -fx-stroke: blue; /* Color del agua */
     -fx-stroke-width: 14; /* Grosor de la línea */
     -fx-stroke-line-cap: round; /* Radio de la línea */
+}
+
+.visor-nivel {
+    -fx-fill: white; /* Color del agua */
+    -fx-stroke: black; /* Color del borde */
+    -fx-stroke-width: 2;
+    -fx-arc-width: 10; /* Ancho del arco */
+    -fx-arc-height: 10; /* Alto del arco */
+}
+
+.texto-nivel {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-fill: black;
 }
 
 

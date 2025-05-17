@@ -5,19 +5,21 @@ import com.modelado.simulacion.model.Tanque;
 import com.modelado.simulacion.utils.Errores;
 import com.modelado.simulacion.utils.Validacion;
 import javafx.animation.*;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +36,10 @@ public class SimulacionController {
     private Path aguaTanque;  // Representación gráfica del agua en el tanque
     private Path aguaTuberia; // Representación gráfica del agua en la tubería
     private List<PathElement> caminoAgua;  // Camino completo que sigue el agua
+    private List<PathElement> caminoAguaSalida;
     private int pasoActual = 0; // Paso actual de la animación de la tubería
     private double nivelActual = tanque.getNivel();  // Nivel actual del tanque (0-1)
+    private Text textoNivel; // Texto que muestra el nivel del agua
     private boolean simulacionActiva = false;
     private AnimationTimer animacion; // Animación para el llenado del tanque
     private AnimationTimer animacionTuberia; // Animación para el agua en la tubería
@@ -44,11 +48,12 @@ public class SimulacionController {
 
     // --- Controles del FXML Existente ---
     @FXML
+    private LineChart<Number, Number> grafica;
+
+    @FXML
     private Pane simulacionPane; // Pane donde se dibuja la simulación
     @FXML
     private TextField setpointField; // Campo de texto para el setpoint
-    @FXML
-    public TextField levelMinField; // Campo de texto para el nivel mínimo
     @FXML
     private Button startButton; // Botón para iniciar la simulación
     @FXML
@@ -56,15 +61,20 @@ public class SimulacionController {
     @FXML
     private Button emptyButton; // Botón para vaciar el tanque
 
+    private XYChart.Series<Number, Number> serieNivel;
+    private int tiempoTotal = 0; // tiempo simulado en segundos
+
+
     @FXML
     private void initialize() {
         restringirSoloNumeros(setpointField);
-        restringirSoloNumeros(levelMinField);
         dibujarSimulacion();  // Dibuja el tanque, tuberías, etc.
         crearAnimacionLLenarTanque();     // Crea la animación para el llenado del tanque
         stopButton.setDisable(true); // Deshabilitar el botón de detener al inicio
         emptyButton.setDisable(true); // Deshabilitar el botón de vaciar al inicio
         startButton.setCursor(Cursor.HAND);
+        serieNivel = new XYChart.Series<>();
+        grafica.getData().add(serieNivel);
     }
 
     @FXML
@@ -100,38 +110,42 @@ public class SimulacionController {
     @FXML
     public void handleEmpty() {
         crearAnimacionVaciado();
+        dibujarAguaSalida();
         animacion.start();
     }
     private void dibujarSimulacion() {
+
+
         // Limpia el Pane antes de dibujar
         simulacionPane.getChildren().clear();
-
-        // Controlador LC
-        DoubleProperty levelMin = enlazarCampoConDouble(levelMinField, 0.5);
-        simulacionPane.getChildren().add(dibujarControlador(levelMin));
-
-        // Transmisor LT
-        DoubleProperty setpoint = enlazarCampoConDouble(setpointField, 1.0);
-        simulacionPane.getChildren().add(dibujarTransmisor(setpoint));
 
         dibujarTanque();
         dibujarTuberiaEntrada();
         dibujarValvula();
         dibujarTuberiaSalida();
-        dibujarControlador(levelMin);
-        dibujarTransmisor(setpoint);
+        dibujarTransmisor();
+        dibujarControlador();
+
+        URL recurso = getClass().getResource("/com/modelado/simulacion/images/casa_tanque.png");
+        Image imagen = new Image(recurso.toExternalForm());
+        ImageView imageView = new ImageView(imagen);
+        imageView.setLayoutX(413);
+        imageView.setLayoutY(360);
+
+        simulacionPane.getChildren().add(imageView);
+
     }
     private void dibujarAguaTuberia() {
         caminoAgua = new ArrayList<>();
-        caminoAgua.add(new MoveTo(147, 47));
+        caminoAgua.add(new MoveTo(147, 67));
 
         // Tramo horizontal
         for (int x = 150; x <= 238; x += 1) {
-            caminoAgua.add(new LineTo(x, 47));
+            caminoAgua.add(new LineTo(x, 67));
         }
 
         // Curva: la simplificamos con dos segmentos
-        caminoAgua.add(new QuadCurveTo(248, 47, 248, 57));
+        caminoAgua.add(new QuadCurveTo(248, 67, 248, 77));
 
         // Tramo vertical largo: también lo dividimos
         for (int y = 70; y <= 315-nivelActual; y += 2) {
@@ -144,55 +158,83 @@ public class SimulacionController {
 
         simulacionPane.getChildren().addAll(aguaTuberia);
     }
+
+    private void dibujarAguaSalida() {
+        caminoAguaSalida = new ArrayList<>();
+        // Punto inicial (coincide con la entrada superior de la tubería)
+        caminoAguaSalida.add(new MoveTo(389, 308)); // ligeramente centrado entre 300 y 315
+
+        // Tramo horizontal
+        for (int x = 391; x <= 450; x += 1) {
+            caminoAguaSalida.add(new LineTo(x, 308)); // y = 307 para coincidir con el centro
+        }
+
+        // Curva: hacia abajo, simulando el codo de la tubería
+        caminoAguaSalida.add(new QuadCurveTo(457, 308, 457, 315)); // punto de control centrado
+
+        // Tramo vertical final (hasta el fondo de la tubería)
+        for (int y = 325; y <= 335; y += 1) {
+            caminoAguaSalida.add(new LineTo(457, y));
+        }
+
+        // Crear y aplicar el path que se animará
+        aguaTuberia = new Path();
+        aguaTuberia.getStyleClass().add("agua-tuberia");
+
+        // Agregamos todos los elementos al Path
+        aguaTuberia.getElements().addAll(caminoAguaSalida);
+
+        simulacionPane.getChildren().add(aguaTuberia);
+    }
     private void dibujarTanque() {
         Path contornoTanque = new Path();
         contornoTanque.getElements().addAll(
-                new MoveTo(220, 80),   // Esquina superior izquierda (sin línea superior)
+                new MoveTo(220, 100),   // Esquina superior izquierda (sin línea superior)
                 new LineTo(220, 320),  // Lado izquierdo
-                new QuadCurveTo(317.5, 340, 415, 320), // Curva inferior (centro en X, más abajo en Y)
-                new LineTo(415, 80)    // Lado derecho
+                new QuadCurveTo(317.5, 340, 380, 320), // Curva inferior (centro en X, más abajo en Y)
+                new LineTo(380, 100)    // Lado derecho
         );
         contornoTanque.getStyleClass().add("tanque"); // Aplicar estilo CSS
         // Agua dentro del tanque (inicialmente vacía)
         aguaTanque = new Path();
-        aguaTanque.setFill(Color.BLUE.deriveColor(0, 1, 1, 0.5)); // Azul semitransparente
+        aguaTanque.setFill(Color.BLUE); // Azul semitransparente
 
         simulacionPane.getChildren().addAll(contornoTanque, aguaTanque);
     }
     private void dibujarTuberiaEntrada() {
         Path tuberiaValvulaSup = new Path(
-                new MoveTo(15, 40), // Punto inicial (fuera del tanque)
-                new LineTo(100, 40) // Línea vertical hacia la válvula
+                new MoveTo(15, 60), // Punto inicial (fuera del tanque)
+                new LineTo(100, 60) // Línea vertical hacia la válvula
         );
         tuberiaValvulaSup.getStyleClass().add(CLASE_TUBERIA);
 
         Path tuberiaValvulaInf = new Path(
-                new MoveTo(15, 55), // Punto inicial (fuera del tanque)
-                new LineTo(100, 55) // Línea vertical hacia la válvula
+                new MoveTo(15, 75), // Punto inicial (fuera del tanque)
+                new LineTo(100, 75) // Línea vertical hacia la válvula
         );
         tuberiaValvulaInf.getStyleClass().add(CLASE_TUBERIA);
 
-        Rectangle aguaHastaValvula = new Rectangle(15, 41, 85, 13); // Posición inicial en la base
+        Rectangle aguaHastaValvula = new Rectangle(15, 61, 85, 13); // Posición inicial en la base
         aguaHastaValvula.setFill(Color.BLUE); // Azul semitransparente
 
         // Tubería de entrada superior con curva
         Path tuberiaEntradaSup = new Path();
-        tuberiaEntradaSup.getElements().add(new MoveTo(140, 40));            // Punto inicial
-        tuberiaEntradaSup.getElements().add(new LineTo(245, 40));            // Línea horizontal
+        tuberiaEntradaSup.getElements().add(new MoveTo(140, 60));            // Punto inicial
+        tuberiaEntradaSup.getElements().add(new LineTo(245, 60));            // Línea horizontal
         tuberiaEntradaSup.getElements().add(
-                new QuadCurveTo(255, 40, 255, 50)                                // Curva hacia abajo
+                new QuadCurveTo(255, 60, 255, 70)                                // Curva hacia abajo
         );
-        tuberiaEntradaSup.getElements().add(new LineTo(255, 70));            // Línea vertical final
+        tuberiaEntradaSup.getElements().add(new LineTo(255, 90));            // Línea vertical final
         tuberiaEntradaSup.getStyleClass().add(CLASE_TUBERIA);
 
         // Tubería de entrada inferior con curva
         Path tuberiaEntradaInf = new Path();
-        tuberiaEntradaInf.getElements().add(new MoveTo(140, 55));
-        tuberiaEntradaInf.getElements().add(new LineTo(230, 55));
+        tuberiaEntradaInf.getElements().add(new MoveTo(140, 75));
+        tuberiaEntradaInf.getElements().add(new LineTo(230, 75));
         tuberiaEntradaInf.getElements().add(
-                new QuadCurveTo(240, 55, 240, 65)                                // Curva hacia abajo
+                new QuadCurveTo(240, 75, 240, 75)                                // Curva hacia abajo
         );
-        tuberiaEntradaInf.getElements().add(new LineTo(240, 70));
+        tuberiaEntradaInf.getElements().add(new LineTo(240, 90));
         tuberiaEntradaInf.getStyleClass().add(CLASE_TUBERIA);
 
 
@@ -205,22 +247,22 @@ public class SimulacionController {
     private void dibujarTuberiaSalida() {
         // Tubería superior
         Path tuberiaSalidaSup = new Path();
-        tuberiaSalidaSup.getElements().add(new MoveTo(418, 300));         // Punto inicial
-        tuberiaSalidaSup.getElements().add(new LineTo(480, 300));         // Línea horizontal
+        tuberiaSalidaSup.getElements().add(new MoveTo(383, 300));         // Punto inicial
+        tuberiaSalidaSup.getElements().add(new LineTo(450, 300));         // Línea horizontal
         tuberiaSalidaSup.getElements().add(
-                new QuadCurveTo(495, 300, 495, 315)                            // Curva de codo hacia abajo
+                new QuadCurveTo(465, 300, 465, 315)                            // Curva de codo hacia abajo
         );
-        tuberiaSalidaSup.getElements().add(new LineTo(495, 335));         // Línea vertical final
+        tuberiaSalidaSup.getElements().add(new LineTo(465, 335));         // Línea vertical final
         tuberiaSalidaSup.getStyleClass().add(CLASE_TUBERIA);
 
         // Tubería inferior
         Path tuberiaSalidaInf = new Path();
-        tuberiaSalidaInf.getElements().add(new MoveTo(418, 315));
-        tuberiaSalidaInf.getElements().add(new LineTo(470, 315));
+        tuberiaSalidaInf.getElements().add(new MoveTo(383, 315));
+        tuberiaSalidaInf.getElements().add(new LineTo(440, 315));
         tuberiaSalidaInf.getElements().add(
-                new QuadCurveTo(480, 315, 480, 325)                            // Curva de codo hacia abajo
+                new QuadCurveTo(450, 315, 450, 315)                            // Curva de codo hacia abajo
         );
-        tuberiaSalidaInf.getElements().add(new LineTo(480, 335));
+        tuberiaSalidaInf.getElements().add(new LineTo(450, 335));
         tuberiaSalidaInf.getStyleClass().add(CLASE_TUBERIA);
 
         simulacionPane.getChildren().addAll(tuberiaSalidaSup, tuberiaSalidaInf);
@@ -228,7 +270,7 @@ public class SimulacionController {
     private void dibujarValvula() {
         dibujoValvula = new Arc(
                 120,       // centro X
-                30,       // centro Y
+                50,       // centro Y
                 12,        // radio X
                 12,        // radio Y
                 0,         // ángulo inicial (grados)
@@ -238,30 +280,30 @@ public class SimulacionController {
         dibujoValvula.setType(ArcType.OPEN); // Sin relleno entre los extremos
 
         Path lineaInfValvula = new Path(
-                new MoveTo(108, 30), // Punto de la válvula
-                new LineTo(132, 30) // Línea horizontal hacia la válvula
+                new MoveTo(108, 50), // Punto de la válvula
+                new LineTo(132, 50) // Línea horizontal hacia la válvula
         );
         lineaInfValvula.getStyleClass().add(LINEA_VALVULA);
 
         Path valvulaContornoizq = new Path(
-                new MoveTo(100, 40),
-                new LineTo(100, 55),
-                new LineTo(120, 49),
-                new LineTo(100, 40)
+                new MoveTo(100, 60),
+                new LineTo(100, 75),
+                new LineTo(120, 69),
+                new LineTo(100, 60)
         );
         valvulaContornoizq.getStyleClass().add(LINEA_VALVULA);
 
         Path valvulaContornoDer = new Path(
-                new MoveTo(140, 40),
-                new LineTo(140, 55),
-                new LineTo(120, 49),
-                new LineTo(140, 40)
+                new MoveTo(140, 60),
+                new LineTo(140, 75),
+                new LineTo(120, 69),
+                new LineTo(140, 60)
         );
         valvulaContornoDer.getStyleClass().add(LINEA_VALVULA);
 
         Path lineaValvula = new Path(
-                new MoveTo(120, 49),
-                new LineTo(120, 30)
+                new MoveTo(120, 69),
+                new LineTo(120, 50)
         );
         lineaValvula.getStyleClass().add(LINEA_VALVULA);
 
@@ -269,100 +311,55 @@ public class SimulacionController {
                 valvulaContornoizq, valvulaContornoDer, lineaValvula, lineaInfValvula, dibujoValvula
         );
     }
-    private Group dibujarControlador(DoubleProperty levelMin) {
-        Path lineaControlador = new Path();
-        Circle controlador = new Circle(570, 150, 25, Color.WHITE);
-        Text textoLC = new Text(565, 155, "LC");
+    private void dibujarControlador() {
+        Path lineaControlador = new Path(
+                new MoveTo(485, 200), // Punto inicial
+                new LineTo(550, 200) // Línea vertical hacia el controlador
+        );
+        Circle controlador = new Circle(550, 200, 25, Color.WHITE);
+        Text textoLC = new Text(545, 205, "LC");
+
+        Path lineaValvula = new Path(
+                new MoveTo(550, 200), // Punto de la válvula
+                new LineTo(550, 20),
+                new LineTo(120, 20), // Línea horizontal hacia la válvula
+                new LineTo(120, 37) // Línea vertical hacia la válvula
+        );
+
+        Path lineaVisor = new Path(
+                new MoveTo(550, 200), // Punto de la válvula
+                new LineTo(550, 235) // Línea horizontal hacia la válvula
+        );
+        Rectangle visorNivel = new Rectangle(530, 235, 40, 30);
+
+        textoNivel = new Text(535, 255, String.format("%.2f", nivelActual));
+
 
         controlador.getStyleClass().add("controlador");
         textoLC.getStyleClass().add("texto-controlador");
         lineaControlador.getStyleClass().add("linea-controlador");
-        simulacionPane.getChildren().addAll(controlador, textoLC);
+        lineaValvula.getStyleClass().add("linea-controlador");
+        visorNivel.getStyleClass().add("visor-nivel");
+        lineaVisor.getStyleClass().add(LINEA_VALVULA);
+        textoNivel.getStyleClass().add("texto-nivel");
 
-        levelMin.addListener((obs, oldVal, newVal) -> {
-            // Calcular posición Y (0 = abajo, 1 = arriba)
-            double yPos = calcularPosicionY(newVal.doubleValue());
-
-            // Actualizar tubería
-            lineaControlador.getElements().setAll(
-                    new MoveTo(415, yPos),
-                    new LineTo(570, yPos)
-            );
-
-            // Actualizar transmisor y texto
-            controlador.setCenterY(yPos);
-            textoLC.setY(yPos + 5);
-        });
-
-        // 4. Posición inicial (valor por defecto 1)
-        double yInicial = calcularPosicionY(levelMin.get());
-        lineaControlador.getElements().addAll(
-                new MoveTo(415, yInicial),
-                new LineTo(570, yInicial)
-        );
-        controlador.setCenterY(yInicial);
-        textoLC.setY(yInicial + 5);
-
-        return new Group(lineaControlador, controlador, textoLC);
+        simulacionPane.getChildren().addAll(lineaVisor, lineaValvula, lineaControlador, controlador, textoLC, visorNivel, textoNivel);
     }
-    private Group dibujarTransmisor(DoubleProperty setpointProperty) {
+    private void dibujarTransmisor() {
         // 1. Crear elementos gráficos
-        Path tuberiaTransmisor = new Path();
-        Circle transmisor = new Circle(480, 0, 25); // Posición Y temporal
-        Text textoLT = new Text(475, 0, "LT"); // Posición Y temporal
+        Path tuberiaTransmisor = new Path(
+                new MoveTo(383, 200), // Punto inicial
+                new LineTo(460, 200)  // Línea horizontal hacia el transmisor
+        );
+        Circle transmisor = new Circle(460, 200, 25);
+        Text textoLT = new Text(455, 205, "LT");
 
         // Aplicar estilos CSS
         transmisor.getStyleClass().add("transmisor");
         tuberiaTransmisor.getStyleClass().add("tuberia-transmisor");
         textoLT.getStyleClass().add("texto-transmisor");
 
-        // 3. Listener para actualizar posición cuando cambia el setpoint
-        setpointProperty.addListener((obs, oldVal, newVal) -> {
-            // Calcular posición Y (0 = abajo, 1 = arriba)
-            double yPos = calcularPosicionY(newVal.doubleValue());
-
-            // Actualizar tubería
-            tuberiaTransmisor.getElements().setAll(
-                    new MoveTo(415, yPos),
-                    new LineTo(480, yPos)
-            );
-
-            // Actualizar transmisor y texto
-            transmisor.setCenterY(yPos);
-            textoLT.setY(yPos + 5);
-        });
-
-        // 4. Posición inicial (valor por defecto 1)
-        double yInicial = calcularPosicionY(setpointProperty.get());
-        tuberiaTransmisor.getElements().addAll(
-                new MoveTo(415, yInicial),
-                new LineTo(480, yInicial)
-        );
-        transmisor.setCenterY(yInicial);
-        textoLT.setY(yInicial + 5);
-
-        return new Group(tuberiaTransmisor, transmisor, textoLT);
-    }
-    private double calcularPosicionY(double setpoint) {
-        // Asegurar que el setpoint esté entre 0 y 1
-        double nivel = Math.max(0, Math.min(1, setpoint));
-        // Coordenadas del tanque
-        double ySuperior = 80;   // Parte superior del tanque
-        double yInferior = 320;  // Parte inferior del tanque
-        // Calcular posición Y (invertido porque en JavaFX Y aumenta hacia abajo)
-        return yInferior - (nivel * (yInferior - ySuperior));
-    }
-    private DoubleProperty enlazarCampoConDouble(TextField campo, double valorPorDefecto) {
-        DoubleProperty property = new SimpleDoubleProperty(valorPorDefecto);
-
-        campo.textProperty().addListener((obs, oldVal, newVal) -> {
-            try {
-                property.set(Double.parseDouble(newVal));
-            } catch (NumberFormatException e) {
-                property.set(valorPorDefecto);
-            }
-        });
-        return property;
+        simulacionPane.getChildren().addAll(tuberiaTransmisor, transmisor, textoLT);
     }
 
     // --- Métodos de Animación ---
@@ -390,7 +387,11 @@ public class SimulacionController {
                     double setpoint = obtenerSetpoint();
                     nivelActual = Math.min(nivelActual, setpoint);
 
+                    tiempoTotal += segundosTranscurridos;
+
                     actualizarNivelAgua();
+
+                    serieNivel.getData().add(new XYChart.Data<>(tiempoTotal, nivelActual));
                 }
 
                 if (nivelActual >= 1.0 || nivelActual >= obtenerSetpoint()) {
@@ -399,8 +400,6 @@ public class SimulacionController {
                     simulacionActiva = false;
                     startButton.setDisable(false);
                     startButton.setCursor(Cursor.HAND);
-                    stopButton.setDisable(true);
-                    stopButton.setCursor(Cursor.DEFAULT);
                     dibujoValvula.setFill(Color.RED); // Válvula cerrada
                     pasoActual = caminoAgua.size(); // Por si quieres vaciar la tubería también
                     crearAnimacionVaciadoTuberia();
@@ -536,30 +535,18 @@ public class SimulacionController {
 
     }
 
-    private double obtenerminimo() {
-        try {
-            if (Validacion.validarRango(Double.parseDouble(levelMinField.getText()), 0, 1)) {
-                return Double.parseDouble(levelMinField.getText());
-            } else {
-                Errores.mostrarError("El valor ingresado excede la altura maxima");
-                return 0;
-            }
-        } catch (NumberFormatException e) {
-            Errores.mostrarError("Debe ingresar un valor");
-            return 0;
-        }
-    }
-
     private void actualizarNivelAgua() {
-        double alturaMaxima = 240;        // Altura útil del tanque
+        double alturaMaxima = 220;        // Altura útil del tanque
         double nivelY = 320 - (nivelActual * alturaMaxima); // Coordenada Y del nivel actual
 
         aguaTanque.getElements().setAll(
                 new MoveTo(222, 320),                          // Inferior izquierda
-                new QuadCurveTo(317.5, 340, 413, 320),         // Curva inferior
-                new LineTo(413, nivelY),                       // Lado derecho hacia arriba
+                new QuadCurveTo(317.5, 340, 378, 320),         // Curva inferior
+                new LineTo(378, nivelY),                       // Lado derecho hacia arriba
                 new LineTo(222, nivelY),                       // Lado superior
                 new ClosePath()                                // Cierra el contorno
         );
+
+        textoNivel.setText(String.format("%.2f", nivelActual)); // Actualiza el texto del nivel
     }
 }
