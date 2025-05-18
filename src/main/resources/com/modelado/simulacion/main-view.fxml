@@ -24,7 +24,7 @@
                     <Insets right="25" />
                 </padding>
                 <xAxis>
-                    <NumberAxis label="Tiempo (s)" upperBound="60" />
+                    <NumberAxis fx:id="ejeX" label="Tiempo (s)" upperBound="15" autoRanging="false"/>
                 </xAxis>
                 <yAxis>
                     <NumberAxis autoRanging="false" label="Nivel" upperBound="1" />
