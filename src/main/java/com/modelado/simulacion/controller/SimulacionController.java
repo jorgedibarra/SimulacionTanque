@@ -27,7 +27,7 @@ import java.util.List;
 import static com.modelado.simulacion.utils.Validacion.restringirSoloNumeros;
 
 public class SimulacionController {
-
+    boolean esValidoCambiarColor = true; // Variable de control de color de la valvula en consumo
     Tanque tanque = new Tanque(1.0); // Instancia del modelo Tanque
     Valvula valvula = new Valvula(); // Instancia del modelo Válvula
     private static final String CLASE_TUBERIA = "tuberia"; // Clase CSS para tuberías
@@ -116,17 +116,20 @@ public class SimulacionController {
         stopButton.setDisable(true);
         stopButton.setCursor(Cursor.DEFAULT);
         valvula.cerrar(dibujoValvula);
-        pasoActual = caminoAgua.size(); // Por si quieres vaciar la tubería también
         crearAnimacionVaciadoTuberiaEntrada();
-        animacionVaciadoTuberiaEntrada.start();
+        animacionVaciadoTuberiaEntrada.stop();
         crearAnimacionVaciadoTuberiaSalida();
-        animacionVaciadoTuberiaSalida.start();
+        animacionVaciadoTuberiaSalida.stop();
+        grafica.getData().clear();
+        animacionVaciadoTuberiaEntrada.start();
     }
 
     @FXML
     public void handleEmpty() {
+        dibujoValvula.setFill(Color.GREEN);
         consumoActivado = true;
         modoVaciadoActivo = true;
+        valvula.abrir(dibujoValvula);
         dibujarAguaTuberiaSalida();
         crearAnimacionAguaTuberiaSalida();
         animacionTuberiaSalida.start(); // Inicia la animación de vaciado del tanque
@@ -381,7 +384,6 @@ public class SimulacionController {
 
         animacionTanque = new AnimationTimer() {
             private long ultimoTiempo = 0;
-
             @Override
             public void handle(long ahora) {
                 if (ultimoTiempo == 0) {
@@ -434,11 +436,13 @@ public class SimulacionController {
                     nivelActual = Math.max(nivelActual, 0);
                     actualizo = true;
                     tiempoTranscurrido += segundosTranscurridos;
-                    System.out.println("tiempoTranscurrido: " + tiempoTranscurrido);
+                    if (esValidoCambiarColor) {
+                        valvula.abrir(dibujoValvula); // Válvula de entrada abierta
+                        esValidoCambiarColor= false; // Cambia el color de la válvula
+                    }
 
                     // aquí entra el control automático:
-                    if (nivelActual <= obtenerSetpoint() - 0.1 && tuberiaEnCurso && tiempoTranscurrido > 3.8) {
-                        System.out.println("Modo Llenado");
+                    if (nivelActual <= obtenerSetpoint() - 0.1 && tuberiaEnCurso && tiempoTranscurrido > 5.2) {
                         modoLlenadoActivo = true;
                         modoVaciadoActivo = false;
                         valvula.abrir(dibujoValvula); // Válvula de entrada abierta

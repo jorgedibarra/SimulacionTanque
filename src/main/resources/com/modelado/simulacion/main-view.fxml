@@ -9,7 +9,7 @@
     <left>
         <!-- VISUALIZACIÓN DEL TANQUE -->
         <VBox alignment="center" spacing="10" styleClass="espaciado-panel" HBox.hgrow="ALWAYS">
-            <Label styleClass="label-titulo" text="Simulacíon del tanque" />
+            <Label styleClass="label-titulo" text="Simulación del tanque" />
             <Pane fx:id="simulacionPane" prefWidth="610" style="-fx-background-color: white;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
         </VBox>
 
@@ -24,7 +24,7 @@
                     <Insets right="25" />
                 </padding>
                 <xAxis>
-                    <NumberAxis fx:id="ejeX" label="Tiempo (s)" upperBound="15" autoRanging="false"/>
+                    <NumberAxis fx:id="ejeX" label="Tiempo (s)" upperBound="15"/>
                 </xAxis>
                 <yAxis>
                     <NumberAxis autoRanging="false" label="Nivel" upperBound="1" />
