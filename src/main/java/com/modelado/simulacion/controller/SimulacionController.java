@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -48,6 +49,7 @@ public class SimulacionController {
     private boolean modoVaciadoActivo = false;
     private boolean consumoActivado = false;
     private boolean primeraVez = true;
+    private boolean primeraVezTanque = true; // Para evitar que el agua se dibuje varias veces
     private boolean tuberiaEnCurso = false; // Para evitar que el agua se dibuje varias veces
 
     private AnimationTimer animacionTanque; // Animación para el llenado del tanque
@@ -59,9 +61,12 @@ public class SimulacionController {
     private double tiempoTotal = 0; // tiempo simulado en segundos
     double tiempoTranscurrido = 0;
 
+    @FXML
+    NumberAxis ejeY = new NumberAxis();
+
     // --- Controles del FXML Existente ---
     @FXML
-    private LineChart<Number, Number> grafica;
+    private LineChart<Number, Number> grafica; // Gráfica para mostrar el nivel de agua
     @FXML
     private Pane simulacionPane; // Pane donde se dibuja la simulación
     @FXML
@@ -83,6 +88,7 @@ public class SimulacionController {
         serieNivel = new XYChart.Series<>();
         grafica.setLegendVisible(false);
         grafica.getData().add(serieNivel);
+        ejeY.setTickUnit(0.1);
     }
 
     @FXML
@@ -104,7 +110,6 @@ public class SimulacionController {
             animacionTuberiaEntrada.start(); // Solo inicia esto. Lo demás se activa automáticamente después.
         }
     }
-
     @FXML
     private void handleStop() {
         simulacionActiva = false;
@@ -120,20 +125,20 @@ public class SimulacionController {
         animacionVaciadoTuberiaEntrada.stop();
         crearAnimacionVaciadoTuberiaSalida();
         animacionVaciadoTuberiaSalida.stop();
-        grafica.getData().clear();
         animacionVaciadoTuberiaEntrada.start();
     }
-
     @FXML
     public void handleEmpty() {
-        dibujoValvula.setFill(Color.GREEN);
         consumoActivado = true;
         modoVaciadoActivo = true;
         valvula.abrir(dibujoValvula);
         dibujarAguaTuberiaSalida();
         crearAnimacionAguaTuberiaSalida();
         animacionTuberiaSalida.start(); // Inicia la animación de vaciado del tanque
+        emptyButton.setDisable(true); // Deshabilitar el botón de consumo
+        emptyButton.setCursor(Cursor.DEFAULT);
     }
+
     private void dibujarSimulacion() {
         // Limpia el Pane antes de dibujar
         simulacionPane.getChildren().clear();
@@ -381,7 +386,6 @@ public class SimulacionController {
 
     // --- Métodos de Animación ---
     private void crearAnimacionTanque() {
-
         animacionTanque = new AnimationTimer() {
             private long ultimoTiempo = 0;
             @Override
@@ -400,38 +404,37 @@ public class SimulacionController {
                     return;
                 }
 
-                double velocidad = 0.08;
+                double velocidad = 0.07;
                 boolean actualizo = false;
+                double setpoint = obtenerSetpoint() + (primeraVezTanque ? 0 : 0.1); // Evita que el agua se dibuje varias veces
 
-                if ( modoLlenadoActivo && nivelActual < obtenerSetpoint()) {
-                    nivelActual += velocidad * segundosTranscurridos;
-                    nivelActual = Math.min(nivelActual, obtenerSetpoint());
+                if ( modoLlenadoActivo && nivelActual < setpoint) { // Si está activo el modo de llenado y el nivel del agua no ha llegado al nivel deseado (setpoint), entra a llenar.
+                    nivelActual += velocidad * segundosTranscurridos; // Aumenta el nivel del agua segun la velocidad
+                    nivelActual = Math.min(nivelActual, setpoint); // Asegura de que no exceda el setpoint
                     actualizo = true;
 
-                    if (nivelActual >= obtenerSetpoint()) {
+                    if (nivelActual >= setpoint) {
                         modoLlenadoActivo = false;
                         modoVaciadoActivo = true;
-                        valvula.cerrar(dibujoValvula); // Válvula cerrada si quieres
+                        valvula.cerrar(dibujoValvula); // Válvula cerrada
+                        primeraVezTanque = false;
+
+                        crearAnimacionVaciadoTuberiaEntrada();
+                        animacionVaciadoTuberiaEntrada.start(); // Inicia la animación de vaciado del tanque
                     }
                 } else {
-                    if (nivelActual >= obtenerSetpoint()) {
-                        modoLlenadoActivo = false;
-                        valvula.cerrar(dibujoValvula);
-                        pasoActual = 0; // Reiniciar el paso de la tubería
-                        crearAnimacionVaciadoTuberiaEntrada();
-                        animacionVaciadoTuberiaEntrada.start(); // Inicia la animación de llenado del tanque
-                    }
+                    modoLlenadoActivo = false;
+                    crearAnimacionVaciadoTuberiaEntrada();
+                    animacionVaciadoTuberiaEntrada.start(); // Inicia la animación de llenado del tanque
                 }
 
                 if (consumoActivado && !tuberiaEnCurso) {
-                    tuberiaEnCurso = true; // ✅ bloquea nuevas llamadas
-
+                    tuberiaEnCurso = true; // bloquea nuevas llamadas
                     dibujarAguaTuberiaEntrada();
                     crearAnimacionAguaTuberiaEntrada();
                     animacionTuberiaEntrada.start();
                 }
-
-                if (consumoActivado && modoVaciadoActivo && nivelActual > 0) {
+                if (consumoActivado && modoVaciadoActivo) {
                     nivelActual -= velocidad * segundosTranscurridos;
                     nivelActual = Math.max(nivelActual, 0);
                     actualizo = true;
@@ -440,15 +443,13 @@ public class SimulacionController {
                         valvula.abrir(dibujoValvula); // Válvula de entrada abierta
                         esValidoCambiarColor= false; // Cambia el color de la válvula
                     }
-
                     // aquí entra el control automático:
-                    if (nivelActual <= obtenerSetpoint() - 0.1 && tuberiaEnCurso && tiempoTranscurrido > 5.2) {
+                    if (nivelActual <= obtenerSetpoint() - 0.1 && tuberiaEnCurso && tiempoTranscurrido > 4) {
                         modoLlenadoActivo = true;
                         modoVaciadoActivo = false;
                         valvula.abrir(dibujoValvula); // Válvula de entrada abierta
                     }
                 }
-
                 if (actualizo) {
                     actualizarNivelAgua();
                     tiempoTotal += segundosTranscurridos;
@@ -458,20 +459,21 @@ public class SimulacionController {
         };
     }
     private void crearAnimacionAguaTuberiaEntrada() {
+        pasoActual = 0; // Reiniciar el paso de la tubería
         animacionTuberiaEntrada = new AnimationTimer() {
             private long ultimoTiempo = 0;
 
             @Override
             public void handle(long ahora) {
                 if (ultimoTiempo == 0) {
-                    ultimoTiempo = ahora;
-                    return;
+                    super.start();
+                    ultimoTiempo = 0; // Reiniciar cada vez que comienza
                 }
                 // Calcular el tiempo transcurrido
                 double tiempoTranscurrido = (ahora - ultimoTiempo) / 1_000_000_000.0;
 
                 // intervalo en segundos
-                double intervalo = 0.006;
+                double intervalo = 0.002;
                 if (tiempoTranscurrido >= intervalo && pasoActual < caminoAgua.size()) {
                     aguaTuberiaEntrada.getElements().add(caminoAgua.get(pasoActual));
                     pasoActual++;
@@ -479,17 +481,13 @@ public class SimulacionController {
                 }
 
                 if (pasoActual >= caminoAgua.size()) {
+                    stop();
                     if (primeraVez) {
-                        stop();
                         primeraVez = false;
-                        crearAnimacionTanque(); // Inicia la animación de llenado del tanque
-                        animacionTanque.start(); // Inicia la animación de llenado del tanque
-                    } else {
-                        stop();
-                        modoLlenadoActivo = true;
-                        crearAnimacionVaciadoTuberiaEntrada();
-                        animacionVaciadoTuberiaEntrada.start(); // Inicia la animación de vaciado de la tubería
                     }
+                    modoLlenadoActivo = true;
+                    crearAnimacionTanque(); // Inicia la animación de llenado del tanque
+                    animacionTanque.start();
                 }
             }
         };

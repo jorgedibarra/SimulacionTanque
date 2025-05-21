@@ -24,22 +24,23 @@
                     <Insets right="25" />
                 </padding>
                 <xAxis>
-                    <NumberAxis fx:id="ejeX" label="Tiempo (s)" upperBound="15"/>
+                    <NumberAxis fx:id="ejeX" label="Tiempo (s)" upperBound="15" />
                 </xAxis>
                 <yAxis>
-                    <NumberAxis autoRanging="false" label="Nivel" upperBound="1" />
+                    <NumberAxis fx:id="ejeY" autoRanging="false" label="Nivel de agua (m)" upperBound="1.2" />
                 </yAxis>
             </LineChart>
 
             <!-- CONTROLES -->
-            <VBox alignment="top_left" spacing="30" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS">
+            <VBox alignment="top_left" spacing="25" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS">
 
                 <Label alignment="CENTER" prefHeight="50.0" prefWidth="300.0" styleClass="label-titulo" text="Parametros configurables" />
-                <Label prefHeight="70" styleClass="label-indicaciones" text="Debe ingresar un numero entre 0 y 1 para iniciar la simulacíón" wrapText="true" />
+                <Label prefHeight="80.0" prefWidth="302.0" styleClass="label-indicaciones" text="La altura del tanque es de 1 metro, ingrese un valor entre 0 y 1 para definir el setpoint." wrapText="true" />
 
                 <HBox spacing="9">
-                    <Label text="Setpoint: " />
-                    <TextField fx:id="setpointField" prefHeight="30.0" prefWidth="130.0" />
+                    <Label prefHeight="32.0" prefWidth="73.0" text="Setpoint: " />
+                    <TextField fx:id="setpointField" prefHeight="6.0" prefWidth="126.0" />
+                    <Label prefHeight="29.0" prefWidth="62.0" text="metros. " />
                 </HBox>
 
                 <HBox spacing="10">

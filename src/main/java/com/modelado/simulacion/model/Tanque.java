@@ -16,5 +16,9 @@ public class Tanque {
         return nivel;
     }
 
+    public double getCapacidad() {
+        return capacidad;
+    }
+
 
 }
