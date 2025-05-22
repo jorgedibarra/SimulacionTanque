@@ -1,4 +1,4 @@
-package com.modelado.simulacion.view;
+package com.modelado.simulacion.view.components;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -28,8 +28,12 @@ public class TanqueVisual {
         contorno.getStyleClass().add("tanque"); // Aplicar estilo CSS
         // Agua dentro del tanque (inicialmente vacía)
         agua = new Path();
-        agua.setFill(Color.BLUE.deriveColor(0, 0, 255, 128)); // Azul semitransparente
+        agua.setFill(Color.BLUE); // Azul semitransparente
 
         contenedor.getChildren().addAll(contorno, agua);
+    }
+
+    public Path getAgua() {
+        return agua;
     }
 }

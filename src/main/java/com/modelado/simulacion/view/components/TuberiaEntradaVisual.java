@@ -1,4 +1,4 @@
-package com.modelado.simulacion.view;
+package com.modelado.simulacion.view.components;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
