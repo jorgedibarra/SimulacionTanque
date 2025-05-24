@@ -1,6 +1,6 @@
 package com.modelado.simulacion.view.animations;
 
-import com.modelado.simulacion.view.components.AguaTuberiaEntradaVisual;
+import com.modelado.simulacion.view.components.AguaTuberiaSalidaVisual;
 import javafx.animation.AnimationTimer;
 import javafx.collections.ObservableList;
 import javafx.scene.shape.CubicCurveTo;
@@ -8,14 +8,14 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
 
-public class TuberiaEntradaVaciadoAnimacion extends AnimationTimer {
-    private final AguaTuberiaEntradaVisual aguaTuberiaEntradaVisual;
+public class TuberiaSalidaVaciadoAnimacion extends AnimationTimer {
+    private final AguaTuberiaSalidaVisual aguaTuberiaSalidaVisual;
     private final Runnable animacionCompletada;
     private long ultimoTiempo = 0;
-    private static final double INTERVALO = 0.006; // Intervalo de tiempo entre pasos
+    private static final double INTERVALO = 0.009; // Intervalo de tiempo entre pasos
 
-    public TuberiaEntradaVaciadoAnimacion(AguaTuberiaEntradaVisual aguaTuberiaEntradaVisual, Runnable animacionCompletada) {
-        this.aguaTuberiaEntradaVisual = aguaTuberiaEntradaVisual;
+    public TuberiaSalidaVaciadoAnimacion(AguaTuberiaSalidaVisual aguaTuberiaSalidaVisual, Runnable animacionCompletada) {
+        this.aguaTuberiaSalidaVisual = aguaTuberiaSalidaVisual;
         this.animacionCompletada = animacionCompletada;
     }
 
@@ -28,23 +28,17 @@ public class TuberiaEntradaVaciadoAnimacion extends AnimationTimer {
 
         double tiempoTranscurrido = (ahora - ultimoTiempo) / 1_000_000_000.0; // Convertir a segundos
 
-        // procesar múltiples pasos por frame si es necesario
-        int pasos = (int) (tiempoTranscurrido / INTERVALO);
+        if (tiempoTranscurrido >= INTERVALO) {
+            ObservableList<PathElement> elementos = aguaTuberiaSalidaVisual.getAguaTuberiaSalida().getElements();
 
-        for (int i = 0; i < pasos; i++) {
-            ObservableList<PathElement> elementos = aguaTuberiaEntradaVisual.getAguaTuberia().getElements();
-            boolean continuar = procesarElementos(elementos);
-
-            if (!continuar) {
-                stop();
-                if (animacionCompletada != null) animacionCompletada.run();
-                return;
+            if (!procesarElementos(elementos)) {
+                stop(); // Detener la animación
+                if (animacionCompletada != null) animacionCompletada.run(); // Ejecutar la acción de finalización
             }
-        }
-        if (pasos > 0) {
+
             ultimoTiempo = ahora;
         }
-    }
+        }
 
     private boolean procesarElementos(ObservableList<PathElement> elementos) {
         if (elementos.size() > 2) {
@@ -68,10 +62,5 @@ public class TuberiaEntradaVaciadoAnimacion extends AnimationTimer {
         }
         return false;
     }
-
-    public void reiniciar() {
-        aguaTuberiaEntradaVisual.getAguaTuberia().getElements().clear();
-        ultimoTiempo = 0;
     }
-}
 

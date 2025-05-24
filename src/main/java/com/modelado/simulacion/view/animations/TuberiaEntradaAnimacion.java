@@ -8,7 +8,7 @@ public class TuberiaEntradaAnimacion extends AnimationTimer {
     private final Runnable animacionCompletada;
     private long ultimoTiempo = 0;
     private int pasoActual = 0;
-    private static final double INTERVALO = 0.0025; // Intervalo de tiempo entre pasos
+    private static final double INTERVALO = 0.001; // Intervalo de tiempo entre pasos
 
     public TuberiaEntradaAnimacion(AguaTuberiaEntradaVisual aguaTuberiaEntradaVisual, Runnable animacionCompletada) {
         this.aguaTuberiaEntradaVisual = aguaTuberiaEntradaVisual;
@@ -36,7 +36,6 @@ public class TuberiaEntradaAnimacion extends AnimationTimer {
 
         }
     }
-
     public void reiniciar() {
         aguaTuberiaEntradaVisual.getAguaTuberia().getElements().clear();
         pasoActual = 0;

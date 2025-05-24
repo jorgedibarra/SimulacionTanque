@@ -19,7 +19,7 @@
     <right>
         <VBox alignment="center" prefWidth="350" spacing="10" styleClass="espaciado-panel">
             <!-- GRÁFICA ARRIBA -->
-            <LineChart fx:id="grafica" title="Respuesta del Sistema" VBox.vgrow="ALWAYS">
+            <LineChart fx:id="graficaPunto" title="Respuesta del Sistema" VBox.vgrow="ALWAYS">
                 <padding>
                     <Insets right="25" />
                 </padding>
@@ -43,10 +43,13 @@
                     <Label prefHeight="29.0" prefWidth="62.0" text="metros. " />
                 </HBox>
 
-                <HBox spacing="10">
-                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: green; -fx-text-fill: white;" text="INICIAR" />
-                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: red; -fx-text-fill: white;" text="DETENER" />
-                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="90.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="CONSUMO" />
+                <HBox spacing="15">
+                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: green; -fx-text-fill: white;" text="INICIAR" />
+                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: red; -fx-text-fill: white;" text="DETENER" />
+                </HBox>
+                <HBox spacing="15">
+                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="CONSUMO" />
+                    <Button fx:id="resetButton" onAction="#handleReset" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="REINICIAR" />
                 </HBox>
 
             </VBox>

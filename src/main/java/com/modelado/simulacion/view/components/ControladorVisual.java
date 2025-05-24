@@ -49,6 +49,10 @@ public class ControladorVisual {
         contenedor.getChildren().addAll(lineaVisor, lineaValvula, lineaControlador, controlador, textoLC, visorNivel, textoNivel);
     }
 
+    public void actualizarNivelTexto(double nivelActual) {
+        textoNivel.setText(String.format("%.2f", nivelActual));
+    }
+
     public Text getTextoNivel() {
         return textoNivel;
     }

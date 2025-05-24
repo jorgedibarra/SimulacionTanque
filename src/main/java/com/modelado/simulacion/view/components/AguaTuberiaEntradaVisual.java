@@ -9,7 +9,7 @@ import java.util.List;
 public class AguaTuberiaEntradaVisual {
     private Path aguaTuberia; // Tubería de entrada de agua
     private List<PathElement> caminoAgua;  // Camino completo que sigue el agua
-    private Pane contenedor; // Contenedor donde se dibuja la tubería
+    private final Pane contenedor; // Contenedor donde se dibuja la tubería
 
     public AguaTuberiaEntradaVisual(Pane contenedor, double nivelActual) {
         this.contenedor = contenedor;
@@ -21,7 +21,7 @@ public class AguaTuberiaEntradaVisual {
         caminoAgua.add(new MoveTo(147, 67));
 
         // Tramo horizontal
-        for (int x = 150; x <= 238; x += 1) {
+        for (int x = 150; x <= 238; x += 3) {
             caminoAgua.add(new LineTo(x, 67));
         }
 
@@ -29,7 +29,7 @@ public class AguaTuberiaEntradaVisual {
         caminoAgua.add(new QuadCurveTo(248, 67, 248, 77));
 
         // Tramo vertical largo: también lo dividimos
-        for (int y = 70; y <= 315-nivelActual; y += 2) {
+        for (int y = 70; y <= 315-nivelActual; y += 4) {
             caminoAgua.add(new LineTo(248, y));
         }
         // Path que se animará gradualmente
@@ -44,15 +44,7 @@ public class AguaTuberiaEntradaVisual {
         return aguaTuberia;
     }
 
-    public void setAguaTuberia(Path aguaTuberia) {
-        this.aguaTuberia = aguaTuberia;
-    }
-
     public List<PathElement> getCaminoAgua() {
         return caminoAgua;
-    }
-
-    public void setCaminoAgua(List<PathElement> caminoAgua) {
-        this.caminoAgua = caminoAgua;
     }
 }

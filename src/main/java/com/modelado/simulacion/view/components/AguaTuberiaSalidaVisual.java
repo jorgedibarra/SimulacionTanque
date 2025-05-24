@@ -8,7 +8,7 @@ import java.util.List;
 
 public class AguaTuberiaSalidaVisual {
     private Path aguaTuberiaSalida;
-    private Pane contenedor;
+    private final Pane contenedor;
     private List<PathElement> caminoAguaSalida; // Camino completo que sigue el agua
 
     public AguaTuberiaSalidaVisual(Pane contenedor) {
@@ -38,16 +38,12 @@ public class AguaTuberiaSalidaVisual {
         aguaTuberiaSalida.getStyleClass().add("agua-tuberia");
 
         // Agregamos todos los elementos al Path
-        aguaTuberiaSalida.getElements().addAll(caminoAguaSalida);
+        aguaTuberiaSalida.getElements().addAll(caminoAguaSalida.get(0));
         contenedor.getChildren().add(aguaTuberiaSalida);
     }
 
     public List<PathElement> getCaminoAguaSalida() {
         return caminoAguaSalida;
-    }
-
-    public void setCaminoAguaSalida(List<PathElement> caminoAguaSalida) {
-        this.caminoAguaSalida = caminoAguaSalida;
     }
 
     public Path getAguaTuberiaSalida() {
