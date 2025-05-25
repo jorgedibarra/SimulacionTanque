@@ -8,7 +8,6 @@ import com.modelado.simulacion.utils.Errores;
 import com.modelado.simulacion.utils.Validacion;
 import com.modelado.simulacion.view.animations.*;
 import com.modelado.simulacion.view.components.*;
-import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
@@ -18,8 +17,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.util.Duration;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 
@@ -48,8 +48,6 @@ public class SimulacionController {
     private TuberiaEntradaVaciadoAnimacion tuberiaEntradaVaciadoAnimacion; // Animación de la tubería de entrada al vaciar
     private double nivelActual = tanque.getNivel();  // Nivel actual del tanque (0-1)
 
-    private final PauseTransition pausa = new PauseTransition(Duration.seconds(0.7)); // Pausa para la animación
-
     private boolean consumoActivo = false; // Flag para el consumo activo
     private boolean primeraVez = true; // Flag para el primer llenado
     private XYChart.Series<Number, Number> serieNivel;
@@ -71,13 +69,30 @@ public class SimulacionController {
     private Button emptyButton; // Botón para vaciar el tanque
     @FXML
     private Button resetButton; // Botón para reiniciar la simulación
+    @FXML
+    private BorderPane panelPrincipal;
+
+    URL rutafondo = getClass().getResource("/com/modelado/simulacion/images/fondo.jpg");
+    Image imagenFondo = new Image(rutafondo.toExternalForm());
+    // Ícono para el botón de iniciar
+    FontIcon iconoPlay = new FontIcon("fas-play"); // FontAwesome Solid (fas)
+    FontIcon iconoReset = new FontIcon("fas-redo"); // FontAwesome Solid (fas)
+    FontIcon iconoStop = new FontIcon("fas-stop"); // FontAwesome Solid (fas)
+    FontIcon iconoEmpty = new FontIcon("fas-tint"); // FontAwesome Solid (fas)
 
     @FXML
     private void initialize() {
+        setIconoPlay(iconoPlay); // Configurar el ícono de inicio
+        setIconoPlay(iconoReset); // Configurar el ícono de reinicio
+        setIconoPlay(iconoStop); // Configurar el ícono de detener
+        setIconoPlay(iconoEmpty);
+        iniciarIconos();
         restringirSoloNumeros(setpointField); // Restringir el campo a solo números
         dibujarSimulacion();  // Dibuja el tanque, tuberías, etc.
         configurarGrafica(); // Configurar la gráfica
         configurarBotones(-1); // Configurar los botones al inicio
+        panelPrincipal.getChildren().add(0, new ImageView(imagenFondo)); // Agregar la imagen de fondo al panel principal
+
     }
 
     @FXML
@@ -90,13 +105,15 @@ public class SimulacionController {
                 if (primeraVez) {
                     primeraVez = false; // Cambiar el flag para el primer llenado
                     tanqueLLenadoAnimacion = new TanqueLLenadoAnimacion(tanqueVisual, () -> {
-                        valvula.cerrar(valvulaVisual.getDibujoValvula());
                         tuberiaEntradaVaciadoAnimacion = new TuberiaEntradaVaciadoAnimacion(aguaTuberiaEntradaVisual, () -> {
-
+                            valvula.cerrar(valvulaVisual.getDibujoValvula());
                         });
                         tuberiaEntradaVaciadoAnimacion.start();
                     }, grafica, controladorVisual.getTextoNivel());
                     tanqueLLenadoAnimacion.configurar(obtenerSetpoint() - 0.1); // Configurar el llenado del tanque
+                    tanqueLLenadoAnimacion.start();
+                } else {
+                    tanqueLLenadoAnimacion.configurar(obtenerSetpoint()); // Configurar el llenado del tanque
                     tanqueLLenadoAnimacion.start();
                 }
             });
@@ -152,12 +169,7 @@ public class SimulacionController {
     }
 
     private void llenadoCompleto() {
-        pausa.setOnFinished(event -> {
-            valvula.abrir(valvulaVisual.getDibujoValvula());
-            tuberiaEntradaAnimacion.reiniciar();
-            tuberiaEntradaAnimacion.start();
-        });
-        pausa.play();
+        tuberiaEntradaAnimacion.start();
         tanqueVaciadoAnimacion.configurar(obtenerSetpoint());
         tanqueVaciadoAnimacion.start();
         valvula.cerrar(valvulaVisual.getDibujoValvula());
@@ -284,5 +296,16 @@ public class SimulacionController {
         serieNivel = new XYChart.Series<>(); // Crear nueva instancia
         graficaPunto.getData().add(serieNivel);
         grafica = new Grafica(serieNivel); // Reiniciar la instancia de gráfica
+    }
+
+    private void setIconoPlay(FontIcon iconoPlay) {
+        iconoPlay.setIconSize(15); // Tamaño del ícono
+        iconoPlay.setIconColor(Color.WHITE); // Color del ícono
+    }
+    private void iniciarIconos() {
+        startButton.setGraphic(iconoPlay); // Asignar el ícono al botón de iniciar
+        resetButton.setGraphic(iconoReset); // Asignar el ícono al botón de reiniciar
+        stopButton.setGraphic(iconoStop); // Asignar el ícono al botón de detener
+        emptyButton.setGraphic(iconoEmpty); // Asignar el ícono al botón de vaciar
     }
 }

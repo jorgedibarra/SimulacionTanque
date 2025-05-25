@@ -47,7 +47,7 @@ public class TanqueLLenadoAnimacion extends AnimationTimer {
 
         actualizarVisualizacion(deltaTiempo);
 
-        if (nivelActual >= setpoint + 0.1) {
+        if (nivelActual >= setpoint + 0.1 || nivelActual >= 1) {
             stop();
             onLlenadoCompleto.run();
         }

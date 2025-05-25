@@ -1,7 +1,8 @@
 /* Archivo styles.css */
 .vbox-con-borde {
+    -fx-background-color: white; /* Color de fondo */
     -fx-border-color: black;       /* Color del borde (naranja) */
-    -fx-border-width: 4px;          /* Grosor del borde */
+    -fx-border-width: 5px;          /* Grosor del borde */
     -fx-border-radius: 5px;         /* Bordes redondeados (opcional) */
     -fx-border-style: solid;        /* Estilo: sólido, dashed, etc. */
     -fx-padding: 10px;             /* Espacio interno para que el contenido no toque el borde */
@@ -10,16 +11,63 @@
     -fx-padding: 10px;             /* Espacio interno */
 }
 
-.root {
-    -fx-background-color: linear-gradient(to bottom, #FFFFF0, #DCDCDC);
+.panel {
+    -fx-background-color: white; /* Color de fondo */
+    -fx-border-radius: 5px;        /* Bordes redondeados */
+    -fx-border-color: #ccc;        /* Color del borde */
+    -fx-border-width: 1px;        /* Grosor del borde */
+    -fx-padding: 10px;             /* Espacio interno */
 }
 
 /* Estilo para el Pane de simulación */
 #simulacionPane {
     -fx-border-color: #ccc;
     -fx-border-width: 1px;
+    -fx-background-radius: 5;
 }
 
+#graficaPunto {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5px;        /* Bordes redondeados */
+    -fx-border-color: black;        /* Color del borde */
+    -fx-border-width: 5px;        /* Grosor del borde */
+}
+
+.chart-plot-background {
+    -fx-background-color: white;
+}
+
+
+
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+.chart-series-line {
+    -fx-stroke: black;
+}
+.default-color0.chart-line-symbol {
+    -fx-background-color: black, black;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px;
+}
+
+.chart-title {
+    -fx-font-size: 20px;   /* Cambia el tamaño aquí */
+    -fx-font-weight: bold; /* Opcional: negrita */
+}
+
+#setpointField {
+    -fx-background-color: white; /* Color de fondo */
+    -fx-background-radius: 5;
+    -fx-border-radius: 5px;        /* Bordes redondeados */
+    -fx-border-color: #ccc;        /* Color del borde */
+    -fx-border-width: 1px;        /* Grosor del borde */
+    -fx-padding: 5px;             /* Espacio interno */
+    -fx-font-size: 14px;          /* Tamaño de fuente */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
 .label {
     -fx-font-size: 16px;            /* Tamaño de fuente */
     -fx-font-weight: bold;
@@ -47,7 +95,7 @@
 }
 .text-field:focused {
     -fx-border-color: #66afe9;     /* Color del borde al enfocar */
-    -fx-box-shadow: 0 0 5px rgba(102, 175, 233, 0.5); /* Sombra */
+
 }
 
 /* Estilo para los botones */

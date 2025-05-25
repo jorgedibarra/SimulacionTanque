@@ -5,12 +5,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane styleClass="fondo" stylesheets="@/com/modelado/simulacion/styles/styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.modelado.simulacion.controller.SimulacionController">
+<BorderPane fx:id="panelPrincipal" styleClass="fondo"  stylesheets="@/com/modelado/simulacion/styles/styles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.modelado.simulacion.controller.SimulacionController">
     <left>
         <!-- VISUALIZACIÓN DEL TANQUE -->
         <VBox alignment="center" spacing="10" styleClass="espaciado-panel" HBox.hgrow="ALWAYS">
             <Label styleClass="label-titulo" text="Simulación del tanque" />
-            <Pane fx:id="simulacionPane" prefWidth="610" style="-fx-background-color: white;" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+            <Pane fx:id="simulacionPane" prefWidth="610" styleClass="panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
         </VBox>
 
     </left>
@@ -35,21 +35,21 @@
             <VBox alignment="top_left" spacing="25" styleClass="vbox-con-borde" HBox.hgrow="ALWAYS">
 
                 <Label alignment="CENTER" prefHeight="50.0" prefWidth="300.0" styleClass="label-titulo" text="Parametros configurables" />
-                <Label prefHeight="80.0" prefWidth="302.0" styleClass="label-indicaciones" text="La altura del tanque es de 1 metro, ingrese un valor entre 0 y 1 para definir el setpoint." wrapText="true" />
+                <Label prefHeight="80.0" prefWidth="302.0" styleClass="label-indicaciones" text="Para establecer el setpoint ingrese un numero entre 0 y 1." wrapText="true" />
 
                 <HBox spacing="9">
                     <Label prefHeight="32.0" prefWidth="73.0" text="Setpoint: " />
-                    <TextField fx:id="setpointField" prefHeight="6.0" prefWidth="126.0" />
+                    <TextField fx:id="setpointField" prefHeight="6.0" prefWidth="126.0" styleClass="caja-texto"/>
                     <Label prefHeight="29.0" prefWidth="62.0" text="metros. " />
                 </HBox>
 
                 <HBox spacing="15">
-                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: green; -fx-text-fill: white;" text="INICIAR" />
-                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: red; -fx-text-fill: white;" text="DETENER" />
+                    <Button fx:id="startButton" onAction="#handleStart" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: green; -fx-text-fill: white; -fx-font-weight: bold;" text="INICIAR" />
+                    <Button fx:id="stopButton" onAction="#handleStop" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: red; -fx-text-fill: white; -fx-font-weight: bold;" text="DETENER" />
                 </HBox>
                 <HBox spacing="15">
-                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="CONSUMO" />
-                    <Button fx:id="resetButton" onAction="#handleReset" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: blue; -fx-text-fill: white;" text="REINICIAR" />
+                    <Button fx:id="emptyButton" onAction="#handleEmpty" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;" text="CONSUMO" />
+                    <Button fx:id="resetButton" onAction="#handleReset" prefHeight="26.0" prefWidth="140.0" style="-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;" text="REINICIAR" />
                 </HBox>
 
             </VBox>
