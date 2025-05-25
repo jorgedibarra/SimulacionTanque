@@ -1,9 +1,10 @@
-package com.modelado.simulacion.view;
+package com.modelado.simulacion.view.components;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.*;
 
 public class ValvulaVisual {
+    private Arc dibujoValvula;
     private Pane contenedor; // Contenedor donde se dibuja la válvula
     private static final String LINEA_VALVULA = "valvula-linea"; // Clase CSS para la línea de la válvula
 
@@ -12,7 +13,7 @@ public class ValvulaVisual {
         inicializarComponentes();
     }
     private void inicializarComponentes() {
-        Arc dibujoValvula;
+
         dibujoValvula = new Arc(
                 120,       // centro X
                 50,       // centro Y
@@ -55,5 +56,9 @@ public class ValvulaVisual {
         contenedor.getChildren().addAll(
                 valvulaContornoizq, valvulaContornoDer, lineaValvula, lineaInfValvula, dibujoValvula
         );
+    }
+
+    public Arc getDibujoValvula() {
+        return dibujoValvula;
     }
 }

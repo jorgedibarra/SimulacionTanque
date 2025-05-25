@@ -1,11 +1,8 @@
-package com.modelado.simulacion.view;
+package com.modelado.simulacion.view.components;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.QuadCurveTo;
+import javafx.scene.shape.*;
 
 public class TanqueVisual {
     private Path contorno;
@@ -28,8 +25,25 @@ public class TanqueVisual {
         contorno.getStyleClass().add("tanque"); // Aplicar estilo CSS
         // Agua dentro del tanque (inicialmente vacía)
         agua = new Path();
-        agua.setFill(Color.BLUE.deriveColor(0, 0, 255, 128)); // Azul semitransparente
+        agua.setFill(Color.BLUE); // Azul semitransparente
 
         contenedor.getChildren().addAll(contorno, agua);
+    }
+
+    public void actualizarNivelAgua(double nivelActual) {
+        double alturaMaxima = 220;        // Altura útil del tanque
+        double nivelY = 320 - (nivelActual * alturaMaxima); // Coordenada Y del nivel actual
+
+        agua.getElements().setAll(
+                new MoveTo(222, 320),                          // Inferior izquierda
+                new QuadCurveTo(317.5, 340, 378, 320),         // Curva inferior
+                new LineTo(378, nivelY),                       // Lado derecho hacia arriba
+                new LineTo(222, nivelY),                       // Lado superior
+                new ClosePath()                                // Cierra el contorno
+        );
+    }
+
+    public Path getAgua() {
+        return agua;
     }
 }
